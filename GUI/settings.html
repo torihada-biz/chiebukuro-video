@@ -253,12 +253,58 @@
                 <div class="col-8">
                     <select name="voice_choice" class="form-select" data-toggle="tooltip"
                         data-original-title='The voice platform used for TTS generation'>
-                        <option value="streamlabspolly">Streamlabspolly</option>
                         <option value="tiktok">TikTok</option>
+                        <option value="fishaudio">Fish Audio</option>
+                        <option value="streamlabspolly">Streamlabs Polly</option>
                         <option value="googletranslate">Google Translate</option>
                         <option value="awspolly">AWS Polly</option>
                         <option value="pyttsx">Python TTS (pyttsx)</option>
                     </select>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <label for="fishaudio_api_key" class="col-4">Fish Audio API Key</label>
+                <div class="col-8">
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-key-fill"></i>
+                        </div>
+                        <input value="{{ data.fishaudio_api_key }}" name="fishaudio_api_key" type="text" class="form-control"
+                            data-toggle="tooltip"
+                            data-original-title="Fish Audio API key for TTS generation. Get one at fish.audio">
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2">
+                <label for="fishaudio_voice_select" class="col-4">Fish Audio Voice</label>
+                <div class="col-8">
+                    <select id="fishaudio_voice_select" class="form-select" data-toggle="tooltip"
+                        data-original-title='Select a preset voice or choose Custom to enter your own'
+                        onchange="handleFishAudioVoiceChange(this)">
+                        <option value="bf322df2096a46f18c579d0baa36f41d">Adrian (Default)</option>
+                        <option value="8ef4a238714b45718ce04243307c57a7">E-girl</option>
+                        <option value="802e3bc2b27e49c2995d23ef70e6ac89">Energetic Male</option>
+                        <option value="933563129e564b19a115bedd57b7406a">Sarah</option>
+                        <option value="b347db033a6549378b48d00acb0d06cd">Selene</option>
+                        <option value="536d3a5e000945adb7038665781a4aca">Ethan</option>
+                        <option value="custom">Custom Voice ID...</option>
+                    </select>
+                    <input type="hidden" name="fishaudio_voice" id="fishaudio_voice" value="{{ data.fishaudio_voice }}">
+                </div>
+            </div>
+            <div class="row mb-2" id="fishaudio_custom_row" style="display: none;">
+                <label for="fishaudio_custom_voice" class="col-4">Custom Voice ID</label>
+                <div class="col-8">
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            <i class="bi bi-soundwave"></i>
+                        </div>
+                        <input id="fishaudio_custom_voice" type="text" class="form-control"
+                            placeholder="Enter voice ID from fish.audio"
+                            data-toggle="tooltip"
+                            data-original-title="Voice ID from fish.audio - find it in the URL of any voice">
+                    </div>
+                    <span class="form-text text-muted"><a href="https://fish.audio/discovery" target="_blank">Browse voices at fish.audio/discovery</a></span>
                 </div>
             </div>
             <div class="row mb-2">
@@ -432,6 +478,22 @@
 </main>
 
 <script>
+    // Fish Audio voice change handler (global function for inline onchange)
+    function handleFishAudioVoiceChange(selectElement) {
+        const selected = selectElement.value;
+        const customRow = document.getElementById('fishaudio_custom_row');
+        const hiddenInput = document.getElementById('fishaudio_voice');
+        const customInput = document.getElementById('fishaudio_custom_voice');
+
+        if (selected === 'custom') {
+            customRow.style.display = '';
+            customInput.focus();
+        } else {
+            customRow.style.display = 'none';
+            hiddenInput.value = selected;
+        }
+    }
+
     // Test voices buttons
     var playing = false;
 
@@ -542,6 +604,44 @@
 
         $("#settingsForm select").on("change", function () {
             validate($(this));
+        });
+
+        // Fish Audio voice selector logic
+        const presetVoices = [
+            "bf322df2096a46f18c579d0baa36f41d",
+            "8ef4a238714b45718ce04243307c57a7",
+            "802e3bc2b27e49c2995d23ef70e6ac89",
+            "933563129e564b19a115bedd57b7406a",
+            "b347db033a6549378b48d00acb0d06cd",
+            "536d3a5e000945adb7038665781a4aca"
+        ];
+
+        // Initialize Fish Audio voice on page load
+        const savedVoice = data.fishaudio_voice || "bf322df2096a46f18c579d0baa36f41d";
+        if (presetVoices.includes(savedVoice)) {
+            $("#fishaudio_voice_select").val(savedVoice);
+        } else {
+            $("#fishaudio_voice_select").val("custom");
+            $("#fishaudio_custom_row").show();
+            $("#fishaudio_custom_voice").val(savedVoice);
+        }
+        $("#fishaudio_voice").val(savedVoice);
+
+        // Handle dropdown change
+        $("#fishaudio_voice_select").on("change", function() {
+            const selected = $(this).val();
+            if (selected === "custom") {
+                $("#fishaudio_custom_row").show();
+                $("#fishaudio_custom_voice").focus();
+            } else {
+                $("#fishaudio_custom_row").hide();
+                $("#fishaudio_voice").val(selected);
+            }
+        });
+
+        // Handle custom input change
+        $("#fishaudio_custom_voice").on("input", function() {
+            $("#fishaudio_voice").val($(this).val());
         });
 
         function validate(object) {

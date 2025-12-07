@@ -5,6 +5,7 @@ from rich.console import Console
 from TTS.aws_polly import AWSPolly
 from TTS.elevenlabs import elevenlabs
 from TTS.engine_wrapper import TTSEngine
+from TTS.fishaudio import FishAudio
 from TTS.GTTS import GTTS
 from TTS.openai_tts import OpenAITTS
 from TTS.pyttsx import pyttsx
@@ -23,6 +24,7 @@ TTSProviders = {
     "pyttsx": pyttsx,
     "ElevenLabs": elevenlabs,
     "OpenAI": OpenAITTS,
+    "FishAudio": FishAudio,
 }
 
 
