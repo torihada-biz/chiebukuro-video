@@ -31,7 +31,7 @@ background_thumbnail_font_size = { optional = true, type = "int", default = 96, 
 background_thumbnail_font_color = { optional = true, default = "255,255,255", example = "255,255,255" }
 
 [settings.tts]
-voice_choice = { optional = false, default = "googletranslate", options = ["elevenlabs", "streamlabspolly", "tiktok", "googletranslate", "awspolly", "pyttsx", "OpenAI"], example = "googletranslate", explanation = "TTS音声エンジン（日本語はgoogletranslateかOpenAI推奨）" }
+voice_choice = { optional = false, default = "fishaudio", options = ["elevenlabs", "streamlabspolly", "tiktok", "googletranslate", "awspolly", "pyttsx", "OpenAI", "fishaudio"], example = "fishaudio", explanation = "TTS音声エンジン（日本語はfishaudioかOpenAI推奨）" }
 random_voice = { optional = false, type = "bool", default = false, example = false, options = [true, false] }
 elevenlabs_voice_name = { optional = false, default = "Bella", example = "Bella", options = ["Adam", "Antoni", "Arnold", "Bella", "Domi", "Elli", "Josh", "Rachel", "Sam"] }
 elevenlabs_api_key = { optional = true, example = "21f13f91f54d741e2ae27d2ab1b99d59" }
@@ -47,3 +47,6 @@ openai_api_url = { optional = true, default = "https://api.openai.com/v1/", exam
 openai_api_key = { optional = true, example = "sk-abc123def456..." }
 openai_voice_name = { optional = false, default = "nova", example = "nova", options = ["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "af_heart"] }
 openai_model = { optional = false, default = "tts-1", example = "tts-1", options = ["tts-1", "tts-1-hd", "gpt-4o-mini-tts"] }
+fish_audio_api_key = { optional = true, example = "004089e0a3a24250a82b46dfcb6c1d11", explanation = "Fish Audio APIキー" }
+fish_audio_voice_id = { optional = true, default = "5161d41404314212af1254556477c17d", example = "5161d41404314212af1254556477c17d", explanation = "Fish Audioの日本語ボイスモデルID（デフォルト: 元気な女性）" }
+fish_audio_model = { optional = true, default = "s2-pro", example = "s2-pro", options = ["s1", "s2-pro"], explanation = "Fish Audioのモデル" }
