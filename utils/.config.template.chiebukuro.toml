@@ -1,0 +1,49 @@
+[chiebukuro]
+post_url = { optional = true, default = "", explanation = "特定の知恵袋質問URL。指定すると他のソースは無視されます。", example = "https://detail.chiebukuro.yahoo.co.jp/qa/question_detail/q12345678" }
+source = { optional = true, default = "ranking", options = ["ranking", "category"], explanation = "質問の取得元。ranking=デイリーランキング, category=カテゴリ別", example = "ranking" }
+max_results = { optional = true, default = 10, type = "int", nmin = 1, nmax = 50, explanation = "最大取得件数", example = 10 }
+min_answers = { optional = true, default = 1, type = "int", nmin = 0, explanation = "最小回答数。この数未満の質問はスキップされます", example = 1 }
+max_answer_length = { optional = true, default = 500, type = "int", nmin = 10, nmax = 5000, explanation = "回答の最大文字数", example = 500 }
+min_answer_length = { optional = true, default = 10, type = "int", nmin = 0, nmax = 5000, explanation = "回答の最小文字数", example = 10 }
+blocked_words = { optional = true, default = "", type = "str", explanation = "カンマ区切りのブロックワード。含まれる投稿はスキップされます。", example = "アダルト, 出会い" }
+
+[settings]
+allow_nsfw = { optional = false, type = "bool", default = false, example = false, options = [true, false], explanation = "NSFWコンテンツの許可" }
+theme = { optional = false, default = "dark", example = "dark", options = ["dark", "light", "transparent"], explanation = "テーマ設定（dark/light/transparent）" }
+times_to_run = { optional = false, default = 1, example = 2, explanation = "実行回数", type = "int", nmin = 1 }
+opacity = { optional = false, default = 0.9, example = 0.8, explanation = "テキスト画像の透明度", type = "float", nmin = 0, nmax = 1 }
+storymode = { optional = true, type = "bool", default = true, example = true, options = [true, false], explanation = "ストーリーモード（質問+回答を1つずつ表示）" }
+storymodemethod = { optional = true, default = 1, example = 1, type = "int", nmin = 0, options = [0, 1], explanation = "ストーリーモードの表示方法" }
+storymode_max_length = { optional = true, default = 1000, type = "int", nmin = 1, example = 1000 }
+resolution_w = { optional = false, default = 1080, example = 1080 }
+resolution_h = { optional = false, default = 1920, example = 1920 }
+zoom = { optional = true, default = 1, type = "float", nmin = 0.1, nmax = 2, example = 1 }
+channel_name = { optional = true, default = "知恵袋チャンネル", example = "知恵袋おもしろ動画", explanation = "チャンネル名" }
+
+[settings.background]
+background_video = { optional = true, default = "minecraft", example = "rocket-league", options = ["minecraft", "gta", "rocket-league", "motor-gta", "csgo-surf", "cluster-truck", "minecraft-2", "multiversus", "fall-guys", "steep", ""], explanation = "背景動画" }
+background_audio = { optional = true, default = "lofi", example = "chill-summer", options = ["lofi", "lofi-2", "chill-summer", ""], explanation = "背景音楽" }
+background_audio_volume = { optional = true, type = "float", nmin = 0, nmax = 1, default = 0.15, example = 0.05 }
+enable_extra_audio = { optional = true, type = "bool", default = false, example = false }
+background_thumbnail = { optional = true, type = "bool", default = false, example = false, options = [true, false] }
+background_thumbnail_font_family = { optional = true, default = "arial", example = "arial" }
+background_thumbnail_font_size = { optional = true, type = "int", default = 96, example = 96 }
+background_thumbnail_font_color = { optional = true, default = "255,255,255", example = "255,255,255" }
+
+[settings.tts]
+voice_choice = { optional = false, default = "googletranslate", options = ["elevenlabs", "streamlabspolly", "tiktok", "googletranslate", "awspolly", "pyttsx", "OpenAI"], example = "googletranslate", explanation = "TTS音声エンジン（日本語はgoogletranslateかOpenAI推奨）" }
+random_voice = { optional = false, type = "bool", default = false, example = false, options = [true, false] }
+elevenlabs_voice_name = { optional = false, default = "Bella", example = "Bella", options = ["Adam", "Antoni", "Arnold", "Bella", "Domi", "Elli", "Josh", "Rachel", "Sam"] }
+elevenlabs_api_key = { optional = true, example = "21f13f91f54d741e2ae27d2ab1b99d59" }
+aws_polly_voice = { optional = false, default = "Mizuki", example = "Mizuki", explanation = "AWS Pollyの日本語音声" }
+streamlabs_polly_voice = { optional = false, default = "Matthew", example = "Matthew" }
+tiktok_voice = { optional = true, default = "jp_001", example = "jp_001", explanation = "TikTok TTSの日本語音声" }
+tiktok_sessionid = { optional = true, example = "c76bcc3a7625abcc27b508c7db457ff1" }
+python_voice = { optional = false, default = "1", example = "1" }
+py_voice_num = { optional = false, default = "2", example = "2" }
+silence_duration = { optional = true, example = "0.3", default = 0.3, type = "float" }
+no_emojis = { optional = false, type = "bool", default = true, example = true, options = [true, false] }
+openai_api_url = { optional = true, default = "https://api.openai.com/v1/", example = "https://api.openai.com/v1/" }
+openai_api_key = { optional = true, example = "sk-abc123def456..." }
+openai_voice_name = { optional = false, default = "nova", example = "nova", options = ["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer", "af_heart"] }
+openai_model = { optional = false, default = "tts-1", example = "tts-1", options = ["tts-1", "tts-1-hd", "gpt-4o-mini-tts"] }

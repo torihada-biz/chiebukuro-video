@@ -10,7 +10,6 @@ from pathlib import Path
 from typing import Dict, Final, Tuple
 
 import ffmpeg
-import translators
 from PIL import Image, ImageDraw, ImageFont
 from rich.console import Console
 from rich.progress import track
@@ -69,19 +68,8 @@ class ProgressFfmpeg(threading.Thread):
 
 def name_normalize(name: str) -> str:
     name = re.sub(r'[?\\"%*:|<>]', "", name)
-    name = re.sub(r"( [w,W]\s?\/\s?[o,O,0])", r" without", name)
-    name = re.sub(r"( [w,W]\s?\/)", r" with", name)
-    name = re.sub(r"(\d+)\s?\/\s?(\d+)", r"\1 of \2", name)
-    name = re.sub(r"(\w+)\s?\/\s?(\w+)", r"\1 or \2", name)
-    name = re.sub(r"\/", r"", name)
-
-    lang = settings.config["reddit"]["thread"]["post_lang"]
-    if lang:
-        print_substep("Translating filename...")
-        translated_name = translators.translate_text(name, translator="google", to_language=lang)
-        return translated_name
-    else:
-        return name
+    name = re.sub(r"\/", "", name)
+    return name
 
 
 def prepare_background(reddit_id: str, W: int, H: int) -> str:
@@ -93,7 +81,7 @@ def prepare_background(reddit_id: str, W: int, H: int) -> str:
             output_path,
             an=None,
             **{
-                "c:v": "h264_nvenc",
+                "c:v": "libx264",
                 "b:v": "20M",
                 "b:a": "192k",
                 "threads": multiprocessing.cpu_count(),
@@ -124,7 +112,12 @@ def create_fancy_thumbnail(image, text, text_color, padding, wrap=35):
     """
     print_step(f"Creating fancy thumbnail for: {text}")
     font_title_size = 47
-    font = ImageFont.truetype(os.path.join("fonts", "Roboto-Bold.ttf"), font_title_size)
+    jp_font_path = os.path.join("fonts", "NotoSansJP-Variable.ttf")
+    fallback_font_path = os.path.join("fonts", "Roboto-Bold.ttf")
+    try:
+        font = ImageFont.truetype(jp_font_path, font_title_size)
+    except (OSError, IOError):
+        font = ImageFont.truetype(fallback_font_path, font_title_size)
     image_width, image_height = image.size
 
     # Calculate text height to determine new image height
@@ -359,10 +352,10 @@ def make_final_video(
     title_thumb = reddit_obj["thread_title"]
 
     filename = f"{name_normalize(title)[:251]}"
-    subreddit = settings.config["reddit"]["thread"]["subreddit"]
+    subreddit = "chiebukuro"
 
     if not exists(f"./results/{subreddit}"):
-        print_substep("The 'results' folder could not be found so it was automatically created.")
+        print_substep("resultsフォルダを自動作成しました。")
         os.makedirs(f"./results/{subreddit}")
 
     if not exists(f"./results/{subreddit}/OnlyTTS") and allowOnlyTTSFolder:
@@ -438,7 +431,7 @@ def make_final_video(
                 path,
                 f="mp4",
                 **{
-                    "c:v": "h264_nvenc",
+                    "c:v": "libx264",
                     "b:v": "20M",
                     "b:a": "192k",
                     "threads": multiprocessing.cpu_count(),
@@ -468,7 +461,7 @@ def make_final_video(
                     path,
                     f="mp4",
                     **{
-                        "c:v": "h264_nvenc",
+                        "c:v": "libx264",
                         "b:v": "20M",
                         "b:a": "192k",
                         "threads": multiprocessing.cpu_count(),
@@ -487,7 +480,7 @@ def make_final_video(
         pbar.update(100 - old_percentage)
     pbar.close()
     save_data(subreddit, filename + ".mp4", title, idx, background_config["video"][2])
-    print_step("Removing temporary files 🗑")
+    print_step("一時ファイルを削除中...")
     cleanups = cleanup(reddit_id)
-    print_substep(f"Removed {cleanups} temporary files 🗑")
-    print_step("Done! 🎉 The video is in the results folder 📁")
+    print_substep(f"{cleanups} 件の一時ファイルを削除しました")
+    print_step("完了! 動画は results フォルダにあります")

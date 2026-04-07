@@ -24,7 +24,7 @@ def check_ratelimit(response: Response) -> bool:
             print(f"Ratelimit hit. Sleeping for {time - int(pytime.time())} seconds.")
             sleep_until(time)
             return False
-        except KeyError:  # if the header is not present, we don't know how long to wait
+        except KeyError:
             return False
 
     return True
@@ -33,64 +33,53 @@ def check_ratelimit(response: Response) -> bool:
 def sleep_until(time) -> None:
     """
     Pause your program until a specific end time.
-    'time' is either a valid datetime object or unix timestamp in seconds (i.e. seconds since Unix epoch)
+    'time' is either a valid datetime object or unix timestamp in seconds
     """
     end = time
 
-    # Convert datetime to unix timestamp and adjust for locality
     if isinstance(time, datetime):
-        # If we're on Python 3 and the user specified a timezone, convert to UTC and get the timestamp.
         if sys.version_info[0] >= 3 and time.tzinfo:
             end = time.astimezone(timezone.utc).timestamp()
         else:
             zoneDiff = pytime.time() - (datetime.now() - datetime(1970, 1, 1)).total_seconds()
             end = (time - datetime(1970, 1, 1)).total_seconds() + zoneDiff
 
-    # Type check
     if not isinstance(end, (int, float)):
         raise Exception("The time parameter is not a number or datetime object")
 
-    # Now we wait
     while True:
         now = pytime.time()
         diff = end - now
-
-        #
-        # Time is up!
-        #
         if diff <= 0:
             break
         else:
-            # 'logarithmic' sleeping to minimize loop iterations
             sleep(diff / 2)
 
 
 def sanitize_text(text: str) -> str:
-    r"""Sanitizes the text for tts.
-        What gets removed:
-     - following characters`^_~@!&;#:-%“”‘"%*/{}[]()\|<>?=+`
-     - any http or https links
+    """TTS用にテキストをサニタイズする。
+    URL, HTMLタグ, 特殊記号を除去。日本語の句読点は保持。
 
     Args:
-        text (str): Text to be sanitized
+        text: サニタイズするテキスト
 
     Returns:
-        str: Sanitized text
+        サニタイズ済みテキスト
     """
-
-    # remove any urls from the text
-    regex_urls = r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*"
-
+    # URLを除去
+    regex_urls = r"((http|https)://)?[a-zA-Z0-9./\\?:@\-_=#]+\.[a-zA-Z]{2,6}[a-zA-Z0-9.&/\\?:@\-_=#]*"
     result = re.sub(regex_urls, " ", text)
 
-    # note: not removing apostrophes
-    regex_expr = r"\s['|’]|['|’]\s|[\^_~@!&;#:\-%—“”‘\"%\*/{}\[\]\(\)\\|<>=+]"
-    result = re.sub(regex_expr, " ", result)
-    result = result.replace("+", "plus").replace("&", "and")
+    # HTMLタグを除去
+    result = re.sub(r"<[^>]+>", " ", result)
 
-    # emoji removal if the setting is enabled
+    # 特殊記号を除去（日本語の句読点・かな・漢字は保持）
+    regex_expr = r'[\^_~@!&;#:\-%*/{}\[\]()\\|<>=+]'
+    result = re.sub(regex_expr, " ", result)
+
+    # 絵文字除去（設定で有効時）
     if settings.config["settings"]["tts"]["no_emojis"]:
         result = clean(result, no_emoji=True)
 
-    # remove extra whitespace
+    # 余分な空白を除去
     return " ".join(result.split())

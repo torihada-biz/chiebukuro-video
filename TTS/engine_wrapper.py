@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Tuple
 
 import numpy as np
-import translators
 from moviepy import AudioFileClip
 from moviepy.audio.AudioClip import AudioClip
 from moviepy.audio.fx import MultiplyVolume
@@ -15,7 +14,7 @@ from utils.console import print_step, print_substep
 from utils.voice import sanitize_text
 
 DEFAULT_MAX_LENGTH: int = (
-    50  # Video length variable, edit this on your own risk. It should work, but it's not supported
+    60  # 動画の最大長（秒）。ショート動画は60秒以内推奨
 )
 
 
@@ -51,20 +50,17 @@ class TTSEngine:
 
     def add_periods(
         self,
-    ):  # adds periods to the end of paragraphs (where people often forget to put them) so tts doesn't blend sentences
+    ):  # 段落末に句読点を追加してTTSが文を結合しないようにする
         for comment in self.reddit_object["comments"]:
-            # remove links
+            # URLを除去
             regex_urls = r"((http|https)\:\/\/)?[a-zA-Z0-9\.\/\?\:@\-_=#]+\.([a-zA-Z]){2,6}([a-zA-Z0-9\.\&\/\?\:@\-_=#])*"
             comment["comment_body"] = re.sub(regex_urls, " ", comment["comment_body"])
-            comment["comment_body"] = comment["comment_body"].replace("\n", ". ")
-            comment["comment_body"] = re.sub(r"\bAI\b", "A.I", comment["comment_body"])
-            comment["comment_body"] = re.sub(r"\bAGI\b", "A.G.I", comment["comment_body"])
-            if comment["comment_body"][-1] != ".":
-                comment["comment_body"] += "."
-            comment["comment_body"] = comment["comment_body"].replace(". . .", ".")
-            comment["comment_body"] = comment["comment_body"].replace(".. . ", ".")
-            comment["comment_body"] = comment["comment_body"].replace(". . ", ".")
-            comment["comment_body"] = re.sub(r'\."\.', '".', comment["comment_body"])
+            comment["comment_body"] = comment["comment_body"].replace("\n", "。")
+            # 日本語の句読点で終わっていない場合に追加
+            if comment["comment_body"] and comment["comment_body"][-1] not in ".。！？!?":
+                comment["comment_body"] += "。"
+            # 連続する句読点を整理
+            comment["comment_body"] = re.sub(r"[。．.]{2,}", "。", comment["comment_body"])
 
     def run(self) -> Tuple[int, int]:
         Path(self.path).mkdir(parents=True, exist_ok=True)
@@ -107,7 +103,7 @@ class TTSEngine:
         split_text = [
             x.group().strip()
             for x in re.finditer(
-                r" *(((.|\n){0," + str(self.tts_module.max_chars) + "})(\.|.$))", text
+                r" *(((.|\n){0," + str(self.tts_module.max_chars) + r"})(\.|.$))", text
             )
         ]
         self.create_silence_mp3()
@@ -179,10 +175,5 @@ class TTSEngine:
 
 
 def process_text(text: str, clean: bool = True):
-    lang = settings.config["reddit"]["thread"]["post_lang"]
     new_text = sanitize_text(text) if clean else text
-    if lang:
-        print_substep("Translating Text...")
-        translated_text = translators.translate_text(text, translator="google", to_language=lang)
-        new_text = sanitize_text(translated_text)
     return new_text

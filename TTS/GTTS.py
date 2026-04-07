@@ -13,7 +13,7 @@ class GTTS:
     def run(self, text, filepath, random_voice: bool = False):
         tts = gTTS(
             text=text,
-            lang=settings.config["reddit"]["thread"]["post_lang"] or "en",
+            lang="ja",
             slow=False,
         )
         tts.save(filepath)
