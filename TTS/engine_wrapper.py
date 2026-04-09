@@ -14,7 +14,7 @@ from utils.console import print_step, print_substep
 from utils.voice import sanitize_text
 
 DEFAULT_MAX_LENGTH: int = (
-    60  # 動画の最大長（秒）。ショート動画は60秒以内推奨
+    55  # 動画の最大長（秒）。ショート動画は60秒以内に収める
 )
 
 

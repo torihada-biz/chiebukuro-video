@@ -420,6 +420,7 @@ def make_final_video(
                 final_audio,
                 path,
                 f="mp4",
+                shortest=None,
                 **{
                     "c:v": "libx264",
                     "b:v": "20M",
@@ -450,6 +451,7 @@ def make_final_video(
                     audio,
                     path,
                     f="mp4",
+                    shortest=None,
                     **{
                         "c:v": "libx264",
                         "b:v": "20M",
