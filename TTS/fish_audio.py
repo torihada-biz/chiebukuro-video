@@ -19,6 +19,9 @@ class FishAudio:
         self.model = settings.config["settings"]["tts"].get(
             "fish_audio_model", "s2-pro"
         )
+        self.language = settings.config["settings"]["tts"].get(
+            "fish_audio_language", "ja"
+        )
         if not self.api_key:
             raise ValueError(
                 "Fish Audio APIキーが設定されていません。config.toml の "
@@ -27,13 +30,18 @@ class FishAudio:
 
     def run(self, text: str, filepath: str, random_voice: bool = False):
         """テキストをMP3に変換して保存する"""
+        print(
+            f"[FishAudio] voice={self.voice_id[:8]}... "
+            f"lang={self.language} model={self.model} "
+            f"text={text[:60]}..."
+        )
         resp = requests.post(
             "https://api.fish.audio/v1/tts",
             json={
                 "text": text,
                 "model": self.model,
                 "reference_id": self.voice_id,
-                "language": "ja",
+                "language": self.language,
                 "format": "mp3",
                 "mp3_bitrate": 192,
             },

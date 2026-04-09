@@ -50,3 +50,4 @@ openai_model = { optional = false, default = "tts-1", example = "tts-1", options
 fish_audio_api_key = { optional = true, example = "004089e0a3a24250a82b46dfcb6c1d11", explanation = "Fish Audio APIキー" }
 fish_audio_voice_id = { optional = true, default = "5161d41404314212af1254556477c17d", example = "5161d41404314212af1254556477c17d", explanation = "Fish Audioの日本語ボイスモデルID（デフォルト: 元気な女性）" }
 fish_audio_model = { optional = true, default = "s2-pro", example = "s2-pro", options = ["s1", "s2-pro"], explanation = "Fish Audioのモデル" }
+fish_audio_language = { optional = true, default = "ja", example = "ja", explanation = "Fish Audio TTSの言語コード（日本語: ja）" }
