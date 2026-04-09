@@ -33,8 +33,9 @@ class FishAudio:
                 "text": text,
                 "model": self.model,
                 "reference_id": self.voice_id,
+                "language": "ja",
                 "format": "mp3",
-                "mp3_bitrate": 128,
+                "mp3_bitrate": 192,
             },
             headers={
                 "Authorization": f"Bearer {self.api_key}",
